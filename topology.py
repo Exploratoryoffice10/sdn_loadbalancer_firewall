@@ -18,7 +18,7 @@ def treeTopo():
     h6 = net.addHost( 'h6', ip='10.0.0.6', mac='00:00:00:00:00:06' )
     h7 = net.addHost( 'h7', ip='10.0.0.7', mac='00:00:00:00:00:07' )
     h8 = net.addHost( 'h8', ip='10.0.0.8', mac='00:00:00:00:00:08' )
-    h9 = net.addHost( 'h9', ip='10.0.0.8', mac='00:00:00:00:00:09' )
+    h9 = net.addHost( 'h9', ip='10.0.0.9', mac='00:00:00:00:00:09' )
     
 
     info( '*** Adding switches\n' )
