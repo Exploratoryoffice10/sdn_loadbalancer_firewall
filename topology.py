@@ -18,34 +18,37 @@ def treeTopo():
     h6 = net.addHost( 'h6', ip='10.0.0.6', mac='00:00:00:00:00:06' )
     h7 = net.addHost( 'h7', ip='10.0.0.7', mac='00:00:00:00:00:07' )
     h8 = net.addHost( 'h8', ip='10.0.0.8', mac='00:00:00:00:00:08' )
-    h9 = net.addHost( 'h9', ip='10.0.0.9', mac='00:00:00:00:00:09' )
-
+    h9 = net.addHost( 'h9', ip='10.0.0.8', mac='00:00:00:00:00:09' )
+    
 
     info( '*** Adding switches\n' )
-    s1 = net.addSwitch( 's1' )
-    s2 = net.addSwitch( 's2' )
-    s3 = net.addSwitch( 's3' )
-    s4 = net.addSwitch( 's4' )
-    s5 = net.addSwitch( 's5' )
-    s6 = net.addSwitch( 's6' )
+    s1 = net.addSwitch('s1')
+    s2 = net.addSwitch('s2')
+    s3 = net.addSwitch('s3')
+    s4 = net.addSwitch('s4')
+    s5 = net.addSwitch('s5')
+    s6 = net.addSwitch('s6')
+    s7 = net.addSwitch('s7')
     
     info( '*** Creating links\n' )
-    net.addLink( h1, s3 )
-    net.addLink( h2, s3 )
-    net.addLink( h3, s3 )
-    net.addLink( h4, s4 )
-    net.addLink( h5, s4 )
-    net.addLink( h6, s5 )
-    net.addLink( h7, s5 )
-    net.addLink( h8, s6 )
-    net.addLink( h9, s6 )
-    
+    net.addLink(h1,s3)
+    net.addLink(h2,s3)
+    net.addLink(h3,s4)
+    net.addLink(h4,s4)
+    net.addLink(h5,s6)
+    net.addLink(h6,s6)
+    net.addLink(h7,s7)
+    net.addLink(h8,s7)
+    net.addLink(h9,s7)
+
+    root = s1
     layer1 = [s2,s5]
-    layer2 = [s3,s4,s5,s6]
+    layer2 = [s3,s4,s6,s7]
     
-    for idx,sw in enumerate(layer1):
-        net.addLink( sw, layer2[2*idx] )
-        net.addLink( sw, layer2[2*idx + 1] )
+    for idx,l1 in enumerate(layer1):
+        net.addLink( root,l1 )
+        net.addLink( l1, layer2[2*idx] )
+        net.addLink( l1, layer2[2*idx + 1] )
         
     info( '*** Starting network\n')
     net.start()
