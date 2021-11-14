@@ -10,7 +10,7 @@ import time,csv
 _flood_delay = 0
 
 
-filepath = "pox/misc/rules.csv"
+filepath = "~/pox/pox/misc/rules.csv"
 
 
 def read_rule_file(fp):
@@ -33,10 +33,14 @@ class LearningSwitch (object):
         connection.addListeners(self)
         self.hold_down_expired = _flood_delay == 0
         self.firewall = dict()  # add rules
+        with open(filepath,"r") as file:
+            fr = csv.reader(file)
+            for sp in fr:
+                self.add_rule(IPAddr(sp[0]),IPAddr(sp[1]));
+        
 
-    def add_rule(self):
-       for x in read_rule_file(filepath):
-           self.firewall[x] = True
+    def add_rule(self,src,dst):
+        self.firewall[(src,dst)] = True
 
     def _handle_PacketIn (self, event):
         packet = event.parsed
@@ -118,8 +122,8 @@ class l2_learning (object):
 
     def _handle_ConnectionUp (self, event):
         if event.dpid in self.ignore:
-        log.debug("Ignoring connection %s" % (event.connection,))
-        return
+            log.debug("Ignoring connection %s" % (event.connection,))
+            return
         log.debug("Connection %s" % (event.connection,))
         LearningSwitch(event.connection, self.transparent)
 
