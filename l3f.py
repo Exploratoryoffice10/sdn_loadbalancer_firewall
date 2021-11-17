@@ -32,22 +32,21 @@ class LearningSwitch (object):
         self.blocked_ports = blocked_ports
         log.debug("blocked protocols are %s","_".join(self.blocked_protocols))
         self.firewall = dict()  # add rules
-        self.fw_tcp = [("10.0.0.1","10.0.0.4")]
-        self.fw_udp = [("10.0.0.2","10.0.0.6")]
-        self.fw_icmp = [("10.0.0.5","10.0.0.8")]
+        self.fw_tcp = [("10.0.0.1", "10.0.0.4")]
+        self.fw_udp = [("10.0.0.2", "10.0.0.6")]
+        self.fw_icmp = [("10.0.0.5", "10.0.0.8")]
         self.add_rules()
 
     def add_rules(self):
         if 't' in self.blocked_protocols:
             for src,dst in self.fw_tcp:
-                self.firewall[("tcp",src,dst)] = True
+                self.firewall[("tcp", IPAddr(src), IPAddr(dst))] = True
         if 'u' in self.blocked_protocols:
             for src,dst in self.fw_udp:
-                self.firewall[("udp",src,dst)] = True
+                self.firewall[("udp", IPAddr(src), IPAddr(dst))] = True
         if 'i' in self.blocked_protocols:
             for src,dst in self.fw_icmp:
-                self.firewall[("icmp",src,dst)] = True
-
+                self.firewall[("icmp", IPAddr(src), IPAddr(dst))] = True
 
     def _handle_PacketIn (self, event):
         packet = event.parsed
@@ -133,7 +132,7 @@ class LearningSwitch (object):
 
 
 class l2_learning (object):
-    def __init__ (self, transparent, blocked_protocols, blocked_ports):
+    def __init__ (self, transparent, blocked_protocols, blocked_ports = None):
         core.openflow.addListeners(self)
         self.transparent = transparent
         self.blocked_protocols = blocked_protocols
@@ -164,4 +163,3 @@ def launch (transparent=False, hold_down=_flood_delay, blocked_protocols = None,
         blocked_ports = [int(x) for x in blocked_ports]
 
     core.registerNew(l2_learning, str_to_bool(transparent), blocked_protocols, blocked_ports)
-    
