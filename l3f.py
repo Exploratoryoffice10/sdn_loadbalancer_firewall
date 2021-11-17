@@ -130,17 +130,15 @@ class LearningSwitch (object):
 
 
 class l2_learning (object):
-    def __init__ (self, transparent, ignore = None):
+    def __init__ (self, transparent, blocked_protocols, blocked_ports):
         core.openflow.addListeners(self)
         self.transparent = transparent
-        self.ignore = set(ignore) if ignore else ()
+        self.blocked_protocols = blocked_protocols
+        self.blocked_ports = blocked_ports
 
     def _handle_ConnectionUp (self, event):
-        if event.dpid in self.ignore:
-            log.debug("Ignoring connection %s" % (event.connection,))
-            return
         log.debug("Connection %s" % (event.connection,))
-        LearningSwitch(event.connection, self.transparent)
+        LearningSwitch(event.connection, self.transparent,self.blocked_protocols,self.blocked_ports)
 
 
 def launch (transparent=False, hold_down=_flood_delay, blocked_protocols = None, blocked_ports = None):
