@@ -23,14 +23,15 @@ log = core.getLogger()
 class LearningSwitch (object):
     def __init__ (self, connection, transparent, blocked_protocols = [], blocked_ports = []):
         # Switch we'll be adding L2 learning switch capabilities to
-        self.connection = connection
+        self.connection = connection    
         self.transparent = transparent
         self.macToPort = {}
         connection.addListeners(self)
         self.hold_down_expired = _flood_delay == 0
         self.blocked_protocols = blocked_protocols
         self.blocked_ports = blocked_ports
-        log.debug("blocked protocols are %s","_".join(self.blocked_protocols))
+        log.debug("blocked protocols are %s"," ".join(self.blocked_protocols))
+        log.debug("ports blocked are %s",self.blocked_ports[0])
         self.firewall = dict()  # add rules
         self.fw_tcp = [("10.0.0.1", "10.0.0.4")]
         self.fw_udp = [("10.0.0.2", "10.0.0.6")]
@@ -101,7 +102,15 @@ class LearningSwitch (object):
                     log.debug("blocked icmp packet from %s to %s",packet.next.srcip,packet.next.dstip)
                     drop()
                     return
-        
+
+            # tcp ports
+            z = packet.find('tcp')
+            if z:
+                if z.srcport in  self.blocked_ports or z.dstport in self.blocked_ports:
+                    log.debug("blocked TCP %s <-> %s",z.srcport,z.dstport)
+                    drop()
+                    return
+
         if not self.transparent: # 2
             if packet.type == packet.LLDP_TYPE or packet.dst.isBridgeFiltered():
                 drop() # 2a
