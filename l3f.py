@@ -38,12 +38,15 @@ class LearningSwitch (object):
         self.add_rules()
 
     def add_rules(self):
-        for src,dst in self.fw_tcp:
-            self.firewall[("tcp",src,dst)] = True
-        for src,dst in self.fw_udp:
-            self.firewall[("udp",src,dst)] = True
-        for src,dst in self.fw_icmp:
-            self.firewall[("icmp",src,dst)] = True
+        if 't' in self.blocked_protocols:
+            for src,dst in self.fw_tcp:
+                self.firewall[("tcp",src,dst)] = True
+        if 'u' in self.blocked_protocols:
+            for src,dst in self.fw_udp:
+                self.firewall[("udp",src,dst)] = True
+        if 'i' in self.blocked_protocols:
+            for src,dst in self.fw_icmp:
+                self.firewall[("icmp",src,dst)] = True
 
 
     def _handle_PacketIn (self, event):
@@ -84,17 +87,17 @@ class LearningSwitch (object):
         
         # check before dropping packets
         if isinstance(packet.next,ipv4):
-            if packet.find('tcp') is not None and 't' in self.blocked_protocols:  # tcp packets dropped
+            if packet.find('tcp') is not None:  # tcp packets dropped
                 if self.firewall.get(("tcp",packet.next.srcip,packet.next.dstip),False):
                     log.debug("blocked tcp packet from %s to %s",packet.next.srcip,packet.next.dstip)
                     drop()
                     return
-            if packet.find('udp') is not None and 'u' in self.blocked_protocols:  # udp packets dropped
+            if packet.find('udp') is not None:  # udp packets dropped
                 if self.firewall.get(("udp",packet.next.srcip,packet.next.dstip),False):
                     log.debug("blocked udp packet from %s to %s",packet.next.srcip,packet.next.dstip)
                     drop()
                     return
-            if packet.find('icmp') is not None and 'i' in self.blocked_protocols:  # icmp packets dropped
+            if packet.find('icmp') is not None:  # icmp packets dropped
                 if self.firewall.get(("icmp",packet.next.srcip,packet.next.dstip),False):
                     log.debug("blocked icmp packet from %s to %s",packet.next.srcip,packet.next.dstip)
                     drop()
